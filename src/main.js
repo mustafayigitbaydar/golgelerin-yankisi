@@ -377,6 +377,7 @@ function clearInputState() {
   inputManager.spaceDown = false;
   inputManager.mouseLeftDown = false;
   inputManager.mouseRightDown = false;
+  inputManager.clearTouchState();
   inputManager.resetFrame();
 }
 
@@ -437,6 +438,13 @@ window.addEventListener('keydown', (e) => {
 });
 
 document.getElementById('menu-btn-go').addEventListener('click', () => enterMenu());
+const pauseBtn = document.getElementById('pause-btn');
+if (pauseBtn) {
+  pauseBtn.addEventListener('click', () => {
+    if (gameState === 'playing') pauseGame();
+    else if (gameState === 'paused') resumeGame();
+  });
+}
 
 // Oyun ana menüde başlar: arka planda boş orman arenası, kamera yavaşça döner
 document.body.classList.add('menu-mode');
@@ -523,6 +531,38 @@ function tick(dt) {
     }
 
     inputManager.update(camera);
+    // Dokunmatik cihazlarda en yakın düşmana (yoksa bakış yönüne) otomatik nişan al
+    if (inputManager.isTouchActive) {
+      let best = null;
+      let bestDist = 12.0;
+      for (const e of enemyFactory.enemies) {
+        if (!e.alive || e.isDecoy) continue;
+        const d = e.mesh.position.distanceTo(player.mesh.position);
+        if (d < bestDist) {
+          bestDist = d;
+          best = e.mesh.position;
+        }
+      }
+      if (!best) {
+        let bestPropDist = 4.5;
+        for (const p of roomObjects.props) {
+          if (!p.alive) continue;
+          const d = p.mesh.position.distanceTo(player.mesh.position);
+          if (d < bestPropDist) {
+            bestPropDist = d;
+            best = p.mesh.position;
+          }
+        }
+      }
+      if (best) {
+        inputManager.setAutoAimTarget(best);
+      } else {
+        const ahead = player.mesh.position.clone();
+        ahead.x += Math.sin(player.mesh.rotation.y) * 4;
+        ahead.z += Math.cos(player.mesh.rotation.y) * 4;
+        inputManager.setAutoAimTarget(ahead);
+      }
+    }
     player.update(dt, inputManager);
     combatSystem.update(dt, player, targets);
     elementalManager.update(dt, player, targets);

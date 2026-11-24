@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Gölgelerin Yankısı — Echoes of the Abyss</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -26,6 +26,7 @@
       width: 100%;
       height: 100%;
       cursor: crosshair;
+      touch-action: none;
     }
 
     /* ───── HUD ───── */
@@ -106,7 +107,7 @@
     #boon-list {
       position: absolute;
       top: 20px;
-      right: 75px;
+      right: 120px;
       display: flex;
       flex-wrap: wrap;
       gap: 5px;
@@ -226,8 +227,8 @@
       transition: width 0.08s linear;
     }
 
-    /* ───── Mute Button ───── */
-    #mute-btn {
+    /* ───── Mute & Pause Buttons ───── */
+    #mute-btn, #pause-btn {
       position: absolute;
       top: 18px;
       right: 20px;
@@ -246,7 +247,8 @@
       transition: all 0.2s;
       z-index: 100;
     }
-    #mute-btn:hover {
+    #pause-btn { right: 68px; font-size: 16px; }
+    #mute-btn:hover, #pause-btn:hover {
       background: rgba(16, 48, 38, 0.95);
       border-color: #00ffaa;
       box-shadow: 0 0 14px rgba(0, 255, 170, 0.45);
@@ -569,6 +571,148 @@
       font-size: clamp(14px, 1.8vw, 19px); letter-spacing: 3px; color: #d5e6e0;
       text-align: center; opacity: 0.9;
     }
+
+    /* ───── Mobil Dokunmatik Kontroller (Sadece touch cihazlarda görünür) ───── */
+    #touch-controls {
+      display: none;
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 12;
+    }
+    body.touch-mode:not(.menu-mode) #touch-controls {
+      display: block;
+    }
+    #touch-joystick {
+      position: absolute;
+      left: 24px;
+      bottom: 28px;
+      width: 124px;
+      height: 124px;
+      border-radius: 50%;
+      background: rgba(8, 28, 24, 0.48);
+      border: 2px solid rgba(0, 255, 200, 0.35);
+      box-shadow: 0 0 18px rgba(0, 255, 180, 0.16);
+      pointer-events: auto;
+      touch-action: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #touch-stick {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #5df0c0, #0d7a64);
+      border: 2px solid rgba(255, 255, 255, 0.55);
+      box-shadow: 0 0 14px rgba(0, 255, 204, 0.5);
+      pointer-events: none;
+    }
+    #touch-actions {
+      position: absolute;
+      right: 22px;
+      bottom: 26px;
+      width: 168px;
+      height: 158px;
+      pointer-events: none;
+    }
+    .touch-btn {
+      position: absolute;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      touch-action: none;
+      border: 2px solid rgba(0, 255, 200, 0.48);
+      background: rgba(8, 30, 26, 0.65);
+      color: #e8fff8;
+      font-weight: bold;
+      box-shadow: 0 0 16px rgba(0, 255, 190, 0.22);
+      transition: transform 0.08s, background 0.08s;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .touch-btn.pressed {
+      transform: scale(0.9);
+      background: rgba(0, 210, 165, 0.55);
+      border-color: #ffffff;
+    }
+    .touch-btn span { font-size: 9px; letter-spacing: 0.8px; margin-top: 2px; opacity: 0.88; }
+    #btn-touch-attack {
+      right: 0; bottom: 0;
+      width: 82px; height: 82px; font-size: 26px;
+      border-color: #00ffcc;
+      background: rgba(10, 48, 40, 0.78);
+    }
+    #btn-touch-special {
+      left: 0; bottom: 16px;
+      width: 66px; height: 66px; font-size: 21px;
+      border-color: #d68cff;
+      background: rgba(42, 14, 58, 0.72);
+    }
+    #btn-touch-dash {
+      right: 14px; top: 0;
+      width: 64px; height: 64px; font-size: 20px;
+      border-color: #4df5ff;
+      background: rgba(10, 38, 52, 0.72);
+    }
+
+    /* ───── Responsive Mobil & Küçük Ekran Düzeni ───── */
+    @media (max-width: 900px), (pointer: coarse) {
+      #hud { padding: 10px 12px; }
+      #hp-container, #dash-container { width: 145px; }
+      #hp-bar-outer { height: 15px; }
+      #hp-text { font-size: 10px; }
+      #shard-count { font-size: 12px; margin-top: 5px; }
+      #room-info { top: 8px; }
+      .ri-title { font-size: 12px; letter-spacing: 2px; }
+      .ri-pip { width: 22px; height: 7px; }
+      .ri-pip.boss { width: 28px; height: 10px; }
+      .ri-sub { font-size: 10px; }
+      #boss-bar { top: 86px; width: 78vw; }
+      #boss-name { font-size: 13px; letter-spacing: 2px; }
+      #boon-list { top: 56px; right: 12px; max-width: 140px; }
+      .boon-icon-small { width: 26px; height: 26px; font-size: 13px; }
+      #mute-btn, #pause-btn { top: 10px; width: 34px; height: 34px; font-size: 15px; }
+      #mute-btn { right: 10px; }
+      #pause-btn { right: 50px; }
+
+      /* Silah çubuğunu alta ortaya kompakt yerleştir */
+      #weapon-bar {
+        left: 50%;
+        bottom: 12px;
+        transform: translateX(-50%);
+        gap: 6px;
+      }
+      .weapon-card {
+        min-width: 0;
+        padding: 6px 8px;
+        gap: 4px;
+        flex-direction: column;
+        width: 58px;
+      }
+      .weapon-key, .weapon-title, .special-hint { display: none; }
+      .weapon-icon { font-size: 20px; }
+      .weapon-details { width: 100%; }
+
+      /* Lütuf, Ruh Sunağı ve Menü kartlarını ekrana sığdır */
+      #boon-overlay { padding: 14px; overflow-y: auto; }
+      #boon-overlay h2 { font-size: 20px; margin-bottom: 14px; }
+      #boon-cards { flex-wrap: wrap; justify-content: center; gap: 10px; }
+      .boon-card { width: 150px; padding: 14px 10px; }
+      .boon-card .icon { font-size: 28px; margin-bottom: 6px; }
+      .boon-card .name { font-size: 13px; }
+      .boon-card .desc { font-size: 11px; min-height: 28px; }
+
+      #altar, #howto, #pause { padding: 18px 14px; overflow-y: auto; justify-content: flex-start; padding-top: 32px; }
+      #altar-list, .ctl-grid { grid-template-columns: minmax(260px, 90vw); gap: 10px; }
+      .mm-btn { width: min(290px, 84vw); padding: 12px 16px; font-size: 14px; }
+      .mm-logo { letter-spacing: 5px; }
+      .mm-logo-en { letter-spacing: 5px; margin: 6px 0 32px 5px; }
+      #game-over h1, #victory h1 { font-size: 36px; letter-spacing: 5px; text-align: center; }
+    }
   </style>
 </head>
 <body>
@@ -591,7 +735,20 @@
       </div>
       <div id="room-info">LANETLİ ORMAN - ODA 1</div>
       <div id="boon-list"></div>
+      <button id="pause-btn" title="Duraklat [ESC]">⏸</button>
       <button id="mute-btn" title="Sesi Aç / Kapat">🔊</button>
+    </div>
+
+    <!-- Mobil Dokunmatik Kontroller -->
+    <div id="touch-controls">
+      <div id="touch-joystick">
+        <div id="touch-stick"></div>
+      </div>
+      <div id="touch-actions">
+        <button class="touch-btn" id="btn-touch-dash" type="button">💨<span>DASH</span></button>
+        <button class="touch-btn" id="btn-touch-special" type="button">✨<span>ÖZEL</span></button>
+        <button class="touch-btn" id="btn-touch-attack" type="button">⚔️<span>VUR</span></button>
+      </div>
     </div>
 
     <!-- Bottom-Left Weapon Selector Bar -->

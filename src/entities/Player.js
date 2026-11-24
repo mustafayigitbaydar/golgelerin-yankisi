@@ -508,6 +508,10 @@ export class Player {
     if (input.keys.s) rawDir.z += 1;
     if (input.keys.a) rawDir.x -= 1;
     if (input.keys.d) rawDir.x += 1;
+    if (rawDir.lengthSq() === 0 && input.moveVec && (input.moveVec.x !== 0 || input.moveVec.z !== 0)) {
+      rawDir.x = input.moveVec.x;
+      rawDir.z = input.moveVec.z;
+    }
 
     const worldDir = new THREE.Vector3();
     const isMoving = rawDir.lengthSq() > 0;
@@ -538,8 +542,9 @@ export class Player {
       this._startDash(worldDir);
     }
 
-    // ── Primary Attack Input (Left Click) ──
-    if (input.mouseLeftPressed && !this.isAttacking && this.attackCooldownTimer <= 0) {
+    // ── Primary Attack Input (Left Click / Mobile Attack Button) ──
+    const attackTrigger = input.mouseLeftPressed || (input.isTouchActive && input.mouseLeftDown);
+    if (attackTrigger && !this.isAttacking && this.attackCooldownTimer <= 0) {
       this._startPrimaryAttack(input.mouseWorldPos);
     }
 
@@ -557,7 +562,12 @@ export class Player {
   _updateLocomotionAnim(input) {
     if (this.isAttacking || this.isDashing || this.isDead()) return;
 
-    const isMoving = input.keys.w || input.keys.a || input.keys.s || input.keys.d;
+    const isMoving =
+      input.keys.w ||
+      input.keys.a ||
+      input.keys.s ||
+      input.keys.d ||
+      (input.moveVec && (input.moveVec.x !== 0 || input.moveVec.z !== 0));
     if (isMoving) {
       const runAnim = this.actions['Run_Weapon'] ? 'Run_Weapon' : 'Run';
       this.playAction(runAnim, 0.12, 1.35);
